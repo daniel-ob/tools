@@ -22,7 +22,7 @@ import shutil
 import sys
 import time
 
-CONFIG_FILE = "/home/user/.camera_backup"
+CONFIG_FILE = os.path.expanduser("~/.camera_backup")
 
 # Read config file (JSON)
 try:
