@@ -48,7 +48,7 @@ for idx, folder in enumerate(config):
     print(f"Folder: {origin}")
     print(f"  last copied file modification time: {time.ctime(last_copied_file_mtime)}")
 
-    # Create a list of all files (exclude directories) in origin
+    # Create a list of all files (exclude directories) in origin, and its related mtimes
     files = []
     for filename in os.listdir(origin):
         file_abs_path = os.path.join(origin, filename)
@@ -62,6 +62,7 @@ for idx, folder in enumerate(config):
     # Sort files by modification time
     files.sort(key=lambda file: file["mtime"])
 
+    # Copy newly added files
     new_file_found = False
     for file in files:
         if (file["mtime"] > last_copied_file_mtime):
