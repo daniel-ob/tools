@@ -1,14 +1,14 @@
 #!/usr/bin/python3
-"""Backup camera/mobile photos and videos. Copy only newly added files according to a CONFIG_FILE (JSON) like this one:
+"""Backup phone files. Copy only newly added files according to CONFIG_FILE (JSON) like this one:
 
 [{
     "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XXXXXXXXXXXXXXXX/Phone/DCIM/Camera",
-    "destination": "/home/user/Images/DCIM_Camera_bkp",
+    "destination": "/home/user/PhoneBKP/Camera",
     "last_copied_file_mtime": 0
 },
 {
-    "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XXXXXXXXXXXXXXXX/Phone/WhatsApp/Media/WhatsApp Videos",
-    "destination": "/home/user/Videos/WhatsApp_Videos_bkp",
+    "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XXXXXXXXXXXXXXXX/Phone/SMSBackup",
+    "destination": "/home/user/PhoneBKP/SMS",
     "last_copied_file_mtime": 1634474434.07039
 }]
 
@@ -22,7 +22,7 @@ import shutil
 import sys
 import time
 
-CONFIG_FILE = os.path.expanduser("~/.camera_backup")
+CONFIG_FILE = os.path.expanduser("~/.phone_backup")
 
 # Read config file (JSON)
 try:
