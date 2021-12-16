@@ -54,18 +54,19 @@ for idx, folder in enumerate(config):
         file_abs_path = os.path.join(origin, filename)
         # Note that os.path.isfile needs absolute paths
         if os.path.isfile(file_abs_path):
-            file = {}
-            file["abs_path"] = file_abs_path
-            file["mtime"] = os.path.getmtime(file_abs_path)
+            file = {
+                "abs_path": file_abs_path,
+                "mtime": os.path.getmtime(file_abs_path)
+            }
             files.append(file)
 
     # Sort files by modification time
-    files.sort(key=lambda file: file["mtime"])
+    files.sort(key=lambda f: f["mtime"])
 
     # Copy newly added files
     new_file_found = False
     for file in files:
-        if (file["mtime"] > last_copied_file_mtime):
+        if file["mtime"] > last_copied_file_mtime:
             filename = os.path.basename(file["abs_path"])
             print(f"  copying {filename}")
             
