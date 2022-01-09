@@ -1,19 +1,19 @@
 #!/usr/bin/python3
-"""Backup phone files. Copy only newly added files according to CONFIG_FILE (JSON) like this one:
+"""Backup phone files. Copy newly added and modified files according to CONFIG_FILE (JSON) like this:
 
 [{
-    "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XXXXXXXXXXXXXXXX/Phone/DCIM/Camera",
+    "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XX/Phone/DCIM/Camera",
     "destination": "/home/user/PhoneBKP/Camera",
     "last_copied_file_mtime": 0
 },
 {
-    "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XXXXXXXXXXXXXXXX/Phone/SMSBackup",
-    "destination": "/home/user/PhoneBKP/SMS",
+    "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XX/Phone/Documents",
+    "destination": "/home/user/PhoneBKP/Documents",
     "last_copied_file_mtime": 1634474434.07039
 }]
 
 If last_copied_file_mtime is 0 or "" , then copy all files in origin.
-Update "last_copied_file_mtime"s in CONFIG_FILE each time a new file is copied.
+Update corresponding last_copied_file_mtime in CONFIG_FILE when a new file is copied.
 """
 
 import json
