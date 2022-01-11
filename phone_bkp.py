@@ -38,7 +38,7 @@ for idx, folder in enumerate(config):
         origin = folder["origin"]
         destination = folder["destination"]
         # if last_copied_file_mtime not set, set to 0 so all files will be copied
-        last_copied_file_mtime = folder["last_copied_file_mtime"] if folder["last_copied_file_mtime"] else 0
+        last_copied_file_mtime = folder["last_copied_file_mtime"] or 0
     except KeyError as key:
         sys.exit(f"key {key} not found in config file, folder {idx}")
 
