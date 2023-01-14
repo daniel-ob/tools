@@ -1,23 +1,18 @@
 #!/usr/bin/python3
 """Backup phone files. Copy newly added and modified files according to CONFIG_FILE (JSON) like this:
-
 [{
     "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XX/Phone/DCIM/Camera",
     "destination": "/home/user/PhoneBKP/Camera",
-    "last_copied_file_mtime": 0
 },
 {
     "origin": "/run/user/1000/gvfs/mtp:host=SAMSUNG_SAMSUNG_Android_XX/Phone/Documents",
     "destination": "/home/user/PhoneBKP/Documents",
-    "last_copied_file_mtime": 1634474434.07039
 }]
-
-If last_copied_file_mtime is 0 or "" , then copy all files in origin.
-Update corresponding last_copied_file_mtime in CONFIG_FILE when a new file is copied.
 """
 
 import json
 import os
+from pathlib import Path
 import shutil
 import sys
 import time
@@ -37,50 +32,31 @@ for idx, folder in enumerate(config):
     try:
         origin = folder["origin"]
         destination = folder["destination"]
-        # if last_copied_file_mtime not set, set to 0 so all files will be copied
-        last_copied_file_mtime = folder["last_copied_file_mtime"] or 0
     except KeyError as key:
         sys.exit(f"key {key} not found in config file, folder {idx}")
 
     if not os.path.exists(origin):
-        sys.exit(f"Origin \"{origin}\" not found. The device is connected?")
+        sys.exit(f"Origin \"{origin}\" not found. Is the device connected?")
+
+    # Find mtime of last destination file
+    destination_files = [item for item in Path(destination).iterdir() if item.is_file()]
+    destination_last_file = max(destination_files, key=lambda f: f.stat().st_mtime, default=None)
+    destination_last_file_mtime = destination_last_file.stat().st_mtime or 0
 
     print(f"Folder: {origin}")
-    print(f"  last copied file modification time: {time.ctime(last_copied_file_mtime)}")
-
-    # Create a list of all files (exclude directories) in origin, and its related mtimes
-    files = []
-    for filename in os.listdir(origin):
-        file_abs_path = os.path.join(origin, filename)
-        # Note that os.path.isfile needs absolute paths
-        if os.path.isfile(file_abs_path):
-            file = {
-                "abs_path": file_abs_path,
-                "mtime": os.path.getmtime(file_abs_path)
-            }
-            files.append(file)
-
-    # Sort files by modification time
-    files.sort(key=lambda f: f["mtime"])
+    print(f"  last copied file modification time: {time.ctime(destination_last_file_mtime)}")
 
     # Copy newly added files
+    origin_files = [item for item in Path(origin).iterdir() if item.is_file()]
+    origin_files.sort(key=lambda f: f.stat().st_mtime)
     new_file_found = False
-    for file in files:
-        if file["mtime"] > last_copied_file_mtime:
-            filename = os.path.basename(file["abs_path"])
-            print(f"  copying {filename}")
-            
-            shutil.copy2(file["abs_path"], destination)
+    for file in origin_files:
+        if file.stat().st_mtime > destination_last_file_mtime:
+            print(f"  copying {file.name}")
+            shutil.copy2(file, destination)
             new_file_found = True
 
-    if new_file_found:
-        # Update last copied file mtime
-        config[idx]["last_copied_file_mtime"] = files[-1]["mtime"]
-    else:
+    if not new_file_found:
         print("  No new files found")
 
     print("-------")
-
-# Update stored config file
-with open(CONFIG_FILE, "w") as file:
-    json.dump(config, file)
